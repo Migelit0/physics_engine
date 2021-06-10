@@ -1,5 +1,5 @@
 import pygame
-from consts import WIDTH, HEIGHT
+from consts import WIDTH, HEIGHT, K
 from core import World, Body
 from structures import Vector
 
@@ -25,15 +25,14 @@ if __name__ == '__main__':
         for elem in game.bodies:
             pygame.draw.circle(screen, elem.color, elem.coords, 20)
 
-            k = 1
             if elem.coords[0] <= 0 or elem.coords[0] >= WIDTH:
-                elem.velocity.coords = (-1 * elem.velocity.coords[0] * k, elem.velocity.coords[1])
+                elem.velocity.coords = (-1 * elem.velocity.coords[0] * K, elem.velocity.coords[1])
                 if elem.coords[0] <= 0:
                     elem.coords = (1, elem.coords[1])
                 if elem.coords[0] >= WIDTH:
                     elem.coords = (WIDTH - 1, elem.coords[1])
             if elem.coords[1] <= 0 or elem.coords[1] >= HEIGHT:
-                elem.velocity.coords = (elem.velocity.coords[0], elem.velocity.coords[1] * -1 * k)
+                elem.velocity.coords = (elem.velocity.coords[0], elem.velocity.coords[1] * -1 * K)
                 if elem.coords[0] <= 0:
                     elem.coords = (elem.coords[0], 1)
                 if elem.coords[0] >= HEIGHT:
