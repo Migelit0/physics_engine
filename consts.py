@@ -1,0 +1,3 @@
+G = 6.67 * (10 ** -11)
+DELTA_TIME = 1
+WIDTH, HEIGHT = 1000, 1000
