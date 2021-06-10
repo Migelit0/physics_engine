@@ -1,4 +1,4 @@
-from math import sqrt, atan, sin, cos, pi
+from math import sqrt, atan, sin, cos, pi, atan2
 from consts import G, DELTA_TIME
 from structures import Vector
 
@@ -44,10 +44,16 @@ class World:
                     x1, y1 = body.coords
                     x, y = body_main.coords
 
-                    if x1 == x:
-                        alpha = pi /2
-                    else:
-                        alpha = atan((y1 - y) / (x1 - x))
+                    dx, dy = x1 - x, y1 - y
+                    long = sqrt(dx ** 2 + dy ** 2)  # это типа гипотенуза треугольника
+                    sina = dy / long
+                    cosa = dx / long
+                    alpha = atan2(sina, cosa)
+
+                    # if x1 == x:
+                    #     alpha = pi / 2
+                    # else:
+                    #     alpha = atan((y1 - y) / (x1 - x))
 
                     sina = sin(alpha)
                     cosa = cos(alpha)
@@ -59,7 +65,7 @@ class World:
                     # equal_force += force
 
                 a = equal_force / body_main.mass
-                print(a.coords)
+                # print(a.coords)
                 delta_velocity = a * DELTA_TIME
                 body_main.add_velocity(delta_velocity)
                 body_main.update_coords()
