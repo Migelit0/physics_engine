@@ -38,6 +38,7 @@ class World:
         return G * body_1.mass * body_2.mass / ((body_1 ^ body_2) ** 2)
 
     def count_all_forces_and_change_velocities(self):
+        all_force = Vector((0, 0))
         for body_main in self.bodies:
             for body in self.bodies:
                 equal_force = Vector((0, 0))
@@ -49,27 +50,24 @@ class World:
                     long = sqrt(dx ** 2 + dy ** 2)  # это типа гипотенуза треугольника
                     sina = dy / long
                     cosa = dx / long
-                    alpha = atan2(sina, cosa)
 
-                    # if x1 == x:
-                    #     alpha = pi / 2
-                    # else:
-                    #     alpha = atan((y1 - y) / (x1 - x))
+                    # alpha = atan2(sina,  cosa)  # пипец вообще умно
+                    # sina = sin(alpha)
+                    # cosa = cos(alpha)
 
-                    sina = sin(alpha)
-                    cosa = cos(alpha)
                     abc_force = self.count_abc_force_for_two_bodies(body_main, body)
                     force = Vector((abc_force * cosa, abc_force * sina))
-                    equal_force += force
+                    equal_force = equal_force + force
 
-                    # force = Force(Vector((x1 - x, y1 - y)), self.count_abc_force_for_two_bodies(body_main, body))
-                    # equal_force += force
 
                 a = equal_force / body_main.mass
                 # print(a.coords)
                 delta_velocity = a * DELTA_TIME
                 body_main.add_velocity(delta_velocity)
                 body_main.update_coords()
+
+                all_force = equal_force + all_force
+        print(all_force.coords)
 
 
 if __name__ == '__main__':

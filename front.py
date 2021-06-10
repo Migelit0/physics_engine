@@ -9,12 +9,16 @@ if __name__ == '__main__':
     all_bodies.append(Body(0, mass, (300, 650), Vector((0, 0)), (255, 0, 0)))  # красный
     all_bodies.append(Body(1, mass, (890, 300), Vector((0, 0)), (0, 255, 0)))  # зеленый
     all_bodies.append(Body(2, mass, (900, 900), Vector((0, 0)), (0, 0, 255)))  # синий
+    all_bodies.append(Body(3, mass, (100, 100), Vector((0, 0)), (255, 255, 255)))
+    all_bodies.append(Body(4, mass * 10**2, (300, 300), Vector((0, 0)), (0, 0, 0)))
     game = World(all_bodies)
 
     pygame.init()
     size = WIDTH, HEIGHT
     screen = pygame.display.set_mode(size)
 
+    fps = 144
+    clock = pygame.time.Clock()
     running = True
     while running:
         for event in pygame.event.get():
@@ -40,5 +44,6 @@ if __name__ == '__main__':
 
         game.count_all_forces_and_change_velocities()
 
+        clock.tick(fps)
         pygame.display.flip()
     pygame.quit()
