@@ -4,11 +4,12 @@ from structures import Vector
 
 
 class Body:
-    def __init__(self, id: int, mass: float, coords: tuple, velocity: Vector):
+    def __init__(self, id: int, mass: float, coords: tuple, velocity: Vector, color: tuple):
         self.id = id
         self.mass = mass
         self.coords = coords
         self.velocity = velocity
+        self.color = color
 
     def __eq__(self, other):
         return self.id == other.id
