@@ -1,24 +1,58 @@
+import sys
+import threading
 import pygame
-from consts import WIDTH, HEIGHT, K
+from PyQt5 import QtWidgets
+
+import design
+from consts import WIDTH, HEIGHT, K, FPS
 from core import World, Body
 from structures import Vector
 
-if __name__ == '__main__':
+
+class QtApp(QtWidgets.QMainWindow, design.Ui_Form):
+    def __init__(self):
+        super().__init__()
+        self.setupUi(self)
+
+
+def run_app():
+    app = QtWidgets.QApplication(sys.argv)
+    window = QtApp()
+    window.show()  # Показываем окно
+    app.exec_()  # и запускаем приложение
+
+
+def init_app():
     all_bodies = []
     mass = 10 ** 9
     all_bodies.append(Body(0, mass, (300, 650), Vector((0, 0)), (255, 0, 0)))  # красный
     all_bodies.append(Body(1, mass, (890, 300), Vector((0, 0)), (0, 255, 0)))  # зеленый
     all_bodies.append(Body(2, mass, (900, 900), Vector((0, 0)), (0, 0, 255)))  # синий
-    all_bodies.append(Body(3, mass, (100, 100), Vector((0, 0)), (255, 255, 255)))
-    all_bodies.append(Body(4, mass * 10**2, (300, 300), Vector((0, 0)), (0, 0, 0)))
-    game = World(all_bodies)
 
+    # PyGame init:
     pygame.init()
     size = WIDTH, HEIGHT
     screen = pygame.display.set_mode(size)
-
-    fps = 144
     clock = pygame.time.Clock()
+
+    # PyQt init
+    QtThread = threading.Thread(target=run_app)
+    QtThread.start()
+    # design.runApp()
+    # app = QtWidgets.QApplication(sys.argv)
+    # window = QtApp()
+    # window.show()  # Показываем окно
+    # app.exec_()  # и запускаем приложение
+
+    return all_bodies, screen, clock
+
+
+if __name__ == '__main__':
+    all_bodies, screen, clock = init_app()
+    # all_bodies.append(Body(3, mass, (100, 100), Vector((0, 0)), (255, 255, 255)))
+    # all_bodies.append(Body(4, mass * 10**2, (300, 300), Vector((0, 0)), (0, 0, 0)))
+    game = World(all_bodies)
+
     running = True
     while running:
         for event in pygame.event.get():
@@ -44,6 +78,6 @@ if __name__ == '__main__':
 
         game.count_all_forces_and_change_velocities()
 
-        clock.tick(fps)
+        clock.tick(FPS)
         pygame.display.flip()
     pygame.quit()
