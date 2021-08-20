@@ -64,10 +64,15 @@ class World:
                 # print(a.coords)
                 delta_velocity = a * DELTA_TIME
                 body_main.add_velocity(delta_velocity)
-                body_main.update_coords()
 
                 all_force = equal_force + all_force
         print(all_force.coords)
+
+        for body in self.bodies:
+            body.update_coords()
+
+
+
 
 
 if __name__ == '__main__':

@@ -28,6 +28,9 @@ def init_app():
     all_bodies.append(Body(0, mass, (300, 650), Vector((0, 0)), (255, 0, 0)))  # красный
     all_bodies.append(Body(1, mass, (890, 300), Vector((0, 0)), (0, 255, 0)))  # зеленый
     all_bodies.append(Body(2, mass, (900, 900), Vector((0, 0)), (0, 0, 255)))  # синий
+    all_bodies.append(Body(3, mass, (100, 100), Vector((0, 0)), (255, 255, 255)))
+    all_bodies.append(Body(4, mass * 10**2, (300, 300), Vector((0, 0)), (0, 0, 0)))
+    game = World(all_bodies)
 
     # PyGame init:
     pygame.init()
