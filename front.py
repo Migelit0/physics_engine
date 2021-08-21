@@ -1,5 +1,5 @@
 import sys
-import threading
+
 import pygame
 from PyQt5 import QtWidgets
 
@@ -28,9 +28,9 @@ def init_app():
     all_bodies.append(Body(0, mass, (300, 650), Vector((0, 0)), (255, 0, 0)))  # красный
     all_bodies.append(Body(1, mass, (890, 300), Vector((0, 0)), (0, 255, 0)))  # зеленый
     all_bodies.append(Body(2, mass, (900, 900), Vector((0, 0)), (0, 0, 255)))  # синий
-    all_bodies.append(Body(3, mass, (100, 100), Vector((0, 0)), (255, 255, 255)))
-    all_bodies.append(Body(4, mass * 10**2, (300, 300), Vector((0, 0)), (0, 0, 0)))
-    game = World(all_bodies)
+    # all_bodies.append(Body(3, mass, (100, 100), Vector((0, 0)), (255, 255, 255)))
+    # all_bodies.append(Body(4, mass * 10**2, (300, 300), Vector((0, 0)), (0, 0, 0)))
+    # game = World(all_bodies)
 
     # PyGame init:
     pygame.init()
@@ -39,8 +39,8 @@ def init_app():
     clock = pygame.time.Clock()
 
     # PyQt init
-    QtThread = threading.Thread(target=run_app)
-    QtThread.start()
+    # QtThread = threading.Thread(target=run_app)
+    # QtThread.start()
     # design.runApp()
     # app = QtWidgets.QApplication(sys.argv)
     # window = QtApp()
@@ -57,15 +57,22 @@ if __name__ == '__main__':
     game = World(all_bodies)
 
     running = True
+    is_modeling = False
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:  # ЛКМ
+                    coords = event.pos
+                    game.create_body()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    is_modeling = not is_modeling
 
         screen.fill((0, 0, 0))
-        for elem in game.bodies:
+        for elem in game.bodies:  # отрисовывание всех тел и отскок
             pygame.draw.circle(screen, elem.color, elem.coords, 20)
-
             if elem.coords[0] <= 0 or elem.coords[0] >= WIDTH:
                 elem.velocity.coords = (-1 * elem.velocity.coords[0] * K, elem.velocity.coords[1])
                 if elem.coords[0] <= 0:
@@ -79,7 +86,8 @@ if __name__ == '__main__':
                 if elem.coords[0] >= HEIGHT:
                     elem.coords = (elem.coords[0], HEIGHT - 1)
 
-        game.count_all_forces_and_change_velocities()
+        if is_modeling:
+            game.count_all_forces_and_change_velocities()
 
         clock.tick(FPS)
         pygame.display.flip()

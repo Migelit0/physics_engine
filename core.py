@@ -71,6 +71,14 @@ class World:
         for body in self.bodies:
             body.update_coords()
 
+    def get_new_id(self):
+        return sorted(self.bodies, key=lambda x: x.id)[-1].id + 1
+
+    def create_body(self, mass: float, x: int, y: int, coords: tuple, color: tuple):
+        vel = Vector((x, y))
+        body = Body(self.get_new_id(), mass, coords, vel, color)
+        self.bodies.append(body)
+
 
 
 
