@@ -13,6 +13,22 @@ class QtApp(QtWidgets.QMainWindow, design.Ui_Form):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        self.k_slider.valueChanged[int].connect(self.change_values)     # В ПРОЦЕНТАХ ВВОД ПАМАТУШТА ТАК УДОБНЕЙ
+        self.time_slider.valueChanged[int].connect(self.change_values)
+        self.mass_slider.valueChanged[int].connect(self.change_values)
+        self.x_slider.valueChanged[int].connect(self.change_values)
+        self.y_slider.valueChanged[int].connect(self.change_values)
+
+    def get_data_from_sliders(self):
+        data = {}
+        # внемание говнокод
+        data['k'] = self.k_slider.value()
+        print(data)
+        return data
+
+    def change_values(self, value):  # записать во временный json файл значения всех слайдеров
+        data = self.get_data_from_sliders()
+
 
 
 def run_app():
@@ -26,8 +42,8 @@ def init_app():
     all_bodies = []
     mass = 10 ** 9
     all_bodies.append(Body(0, mass, (300, 650), Vector((0, 0)), (255, 0, 0)))  # красный
-    all_bodies.append(Body(1, mass, (890, 300), Vector((0, 0)), (0, 255, 0)))  # зеленый
-    all_bodies.append(Body(2, mass, (900, 900), Vector((0, 0)), (0, 0, 255)))  # синий
+    all_bodies.append(Body(1, mass, (550, 300), Vector((0, 0)), (0, 255, 0)))  # зеленый
+    all_bodies.append(Body(2, mass, (600, 550), Vector((0, 0)), (0, 0, 255)))  # синий
     # all_bodies.append(Body(3, mass, (100, 100), Vector((0, 0)), (255, 255, 255)))
     # all_bodies.append(Body(4, mass * 10**2, (300, 300), Vector((0, 0)), (0, 0, 0)))
     # game = World(all_bodies)
@@ -57,7 +73,7 @@ if __name__ == '__main__':
     game = World(all_bodies)
 
     running = True
-    is_modeling = False
+    is_modeling = True
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -65,10 +81,13 @@ if __name__ == '__main__':
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:  # ЛКМ
                     coords = event.pos
-                    game.create_body()
+                    # game.create_body()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
-                    is_modeling = not is_modeling
+                    # is_modeling = not is_modeling
+                    run_app()
+                    # TODO: считать из временного джсона все значения слайдеров и применить их
+                    # ЗАПИСАТЬ В КЛАСС ИГРЫ  К/100, А НЕ ПРОСТО К ТК ОН В ПРОЦЕНТАХ /\
 
         screen.fill((0, 0, 0))
         for elem in game.bodies:  # отрисовывание всех тел и отскок
@@ -85,6 +104,7 @@ if __name__ == '__main__':
                     elem.coords = (elem.coords[0], 1)
                 if elem.coords[0] >= HEIGHT:
                     elem.coords = (elem.coords[0], HEIGHT - 1)
+        pygame.draw.circle(screen, (255, 255, 255), game.center_cords, 5)
 
         if is_modeling:
             game.count_all_forces_and_change_velocities()

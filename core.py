@@ -1,4 +1,5 @@
-from math import sqrt, atan, sin, cos, pi, atan2
+from math import sqrt
+
 from consts import G, DELTA_TIME
 from structures import Vector
 
@@ -30,9 +31,10 @@ class Body:
         self.coords = (self.coords[0] + dx, self.coords[1] + dy)
 
 
-class World:
+class World:  # TODO: избавиться от констант и записать это в селф
     def __init__(self, bodies: list):
         self.bodies = bodies
+        self.center_cords = (0, 0)
 
     def count_abc_force_for_two_bodies(self, body_1: Body, body_2: Body):
         return G * body_1.mass * body_2.mass / ((body_1 ^ body_2) ** 2)
@@ -59,28 +61,33 @@ class World:
                     force = Vector((abc_force * cosa, abc_force * sina))
                     equal_force = equal_force + force
 
-
                 a = equal_force / body_main.mass
                 # print(a.coords)
                 delta_velocity = a * DELTA_TIME
                 body_main.add_velocity(delta_velocity)
 
                 all_force = equal_force + all_force
-        print(all_force.coords)
 
         for body in self.bodies:
             body.update_coords()
 
+        self.count_center_coords()
+
     def get_new_id(self):
         return sorted(self.bodies, key=lambda x: x.id)[-1].id + 1
+
+    def count_center_coords(self):
+        center = Vector((0, 0))
+        all_mass = 0
+        for body in self.bodies:
+            center = center + Vector(body.coords) * body.mass
+            all_mass += body.mass
+        self.center_cords = (center / all_mass).coords
 
     def create_body(self, mass: float, x: int, y: int, coords: tuple, color: tuple):
         vel = Vector((x, y))
         body = Body(self.get_new_id(), mass, coords, vel, color)
         self.bodies.append(body)
-
-
-
 
 
 if __name__ == '__main__':
