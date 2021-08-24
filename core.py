@@ -1,3 +1,4 @@
+import json
 from math import sqrt
 
 from consts import G, DELTA_TIME
@@ -35,6 +36,7 @@ class World:  # TODO: избавиться от констант и записа
     def __init__(self, bodies: list):
         self.bodies = bodies
         self.center_cords = (0, 0)
+        self.get_data_from_config(get_config_dict())
 
     def count_abc_force_for_two_bodies(self, body_1: Body, body_2: Body):
         return G * body_1.mass * body_2.mass / ((body_1 ^ body_2) ** 2)
@@ -88,6 +90,18 @@ class World:  # TODO: избавиться от констант и записа
         vel = Vector((x, y))
         body = Body(self.get_new_id(), mass, coords, vel, color)
         self.bodies.append(body)
+
+    def get_data_from_config(self, param_dict):  # полезно так полезно
+        # внемание говнокод
+        self.k = param_dict['k_slider']
+        self.delta_time = param_dict['time_slider']
+        # pass  # кпд, тик и все такое записать в переменные ИЗ СЛОВАРЯ
+
+
+def get_config_dict():
+    with open('temp/config.json') as file:
+        data = json.load(file)
+    return data
 
 
 if __name__ == '__main__':

@@ -1,4 +1,7 @@
 {
-  "k": 1,
-  "time":
+  "k_slider": 1,
+  "time_slider": 100,
+  "mass_slider": 1000000000,
+  "x_slider": 0,
+  "y_slider": 0
 }

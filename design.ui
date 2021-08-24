@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>514</width>
-    <height>740</height>
+    <width>750</width>
+    <height>645</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -121,7 +121,7 @@
     </widget>
    </item>
    <item row="1" column="5">
-    <widget class="QSlider" name="verticalSlider_6">
+    <widget class="QSlider" name="y_sllider">
      <property name="minimum">
       <number>-1000</number>
      </property>

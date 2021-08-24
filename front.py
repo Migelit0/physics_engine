@@ -5,7 +5,7 @@ from PyQt5 import QtWidgets
 
 import design
 from consts import WIDTH, HEIGHT, K, FPS
-from core import World, Body
+from core import World, Body, get_config_dict
 from structures import Vector
 
 
@@ -13,22 +13,16 @@ class QtApp(QtWidgets.QMainWindow, design.Ui_Form):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
-        self.k_slider.valueChanged[int].connect(self.change_values)     # В ПРОЦЕНТАХ ВВОД ПАМАТУШТА ТАК УДОБНЕЙ
+        self.k_slider.valueChanged[int].connect(self.change_values)  # В ПРОЦЕНТАХ ВВОД ПАМАТУШТА ТАК УДОБНЕЙ
         self.time_slider.valueChanged[int].connect(self.change_values)
         self.mass_slider.valueChanged[int].connect(self.change_values)
         self.x_slider.valueChanged[int].connect(self.change_values)
         self.y_slider.valueChanged[int].connect(self.change_values)
-
-    def get_data_from_sliders(self):
-        data = {}
-        # внемание говнокод
-        data['k'] = self.k_slider.value()
-        print(data)
-        return data
+        self.data = get_config_dict()
 
     def change_values(self, value):  # записать во временный json файл значения всех слайдеров
-        data = self.get_data_from_sliders()
-
+        name = self.sender().objectName()
+        self.data[name] = value
 
 
 def run_app():
@@ -44,6 +38,8 @@ def init_app():
     all_bodies.append(Body(0, mass, (300, 650), Vector((0, 0)), (255, 0, 0)))  # красный
     all_bodies.append(Body(1, mass, (550, 300), Vector((0, 0)), (0, 255, 0)))  # зеленый
     all_bodies.append(Body(2, mass, (600, 550), Vector((0, 0)), (0, 0, 255)))  # синий
+    all_bodies.append(Body(3, mass, (100, 100), Vector((0, 0)), (255, 100, 100)))
+    all_bodies.append(Body(4, mass, (300, 300), Vector((0, 0)), (128, 128, 128)))
     # all_bodies.append(Body(3, mass, (100, 100), Vector((0, 0)), (255, 255, 255)))
     # all_bodies.append(Body(4, mass * 10**2, (300, 300), Vector((0, 0)), (0, 0, 0)))
     # game = World(all_bodies)
@@ -68,8 +64,6 @@ def init_app():
 
 if __name__ == '__main__':
     all_bodies, screen, clock = init_app()
-    # all_bodies.append(Body(3, mass, (100, 100), Vector((0, 0)), (255, 255, 255)))
-    # all_bodies.append(Body(4, mass * 10**2, (300, 300), Vector((0, 0)), (0, 0, 0)))
     game = World(all_bodies)
 
     running = True
@@ -104,7 +98,8 @@ if __name__ == '__main__':
                     elem.coords = (elem.coords[0], 1)
                 if elem.coords[0] >= HEIGHT:
                     elem.coords = (elem.coords[0], HEIGHT - 1)
-        pygame.draw.circle(screen, (255, 255, 255), game.center_cords, 5)
+
+        pygame.draw.circle(screen, (255, 255, 255), game.center_cords, 5)  # отрисовка центра масс системы
 
         if is_modeling:
             game.count_all_forces_and_change_velocities()
