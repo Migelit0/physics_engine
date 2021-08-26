@@ -16,6 +16,12 @@ class QtApp(QtWidgets.QMainWindow, design.Ui_Form):
 
         self.data = get_config_dict()
 
+        self.k_slider.setValue(self.data['k_slider'])
+        self.time_slider.setValue(self.data['time_slider'])
+        self.mass_slider.setValue(self.data['mass_slider'])
+        self.x_slider.setValue(self.data['x_slider'])
+        self.y_slider.setValue(self.data['y_slider'])
+
         self.k_slider.valueChanged[int].connect(self.change_values)  # В ПРОЦЕНТАХ ВВОД ПАМАТУШТА ТАК УДОБНЕЙ
         self.time_slider.valueChanged[int].connect(self.change_values)
         self.mass_slider.valueChanged[int].connect(self.change_values)
@@ -106,9 +112,9 @@ if __name__ == '__main__':
                     elem.coords = (WIDTH - 1, elem.coords[1])
             if elem.coords[1] <= 0 or elem.coords[1] >= HEIGHT:  # стукнулся в низ или верх
                 elem.velocity.coords = (elem.velocity.coords[0], elem.velocity.coords[1] * -1 * k)
-                if elem.coords[0] <= 0:  # слишком вверх
+                if elem.coords[1] <= 0:  # слишком вверх
                     elem.coords = (elem.coords[0], 1)
-                if elem.coords[0] >= HEIGHT:  # слишком мниз
+                if elem.coords[1] >= HEIGHT:  # слишком вниз
                     elem.coords = (elem.coords[0], HEIGHT - 1)
 
         pygame.draw.circle(screen, (255, 255, 255), game.center_cords, 5)  # отрисовка центра масс системы
