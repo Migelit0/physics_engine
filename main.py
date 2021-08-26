@@ -117,6 +117,11 @@ if __name__ == '__main__':
                 if elem.coords[1] >= HEIGHT:  # слишком вниз
                     elem.coords = (elem.coords[0], HEIGHT - 1)
 
+        for elem in game.bodies:  # отрисовка красивишных центров
+            pygame.draw.circle(screen, (0, 0, 0), elem.coords, 4)
+            pygame.draw.circle(screen, (255, 255, 255), elem.coords, 3)
+
+        pygame.draw.circle(screen, (0, 0, 0), game.center_cords, 6)
         pygame.draw.circle(screen, (255, 255, 255), game.center_cords, 5)  # отрисовка центра масс системы
 
         if is_modeling:
