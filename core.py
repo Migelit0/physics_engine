@@ -73,9 +73,13 @@ class World:  # TODO: избавиться от констант и записа
         for body in self.bodies:
             body.update_coords()
 
+        print(equal_force.coords)
+
         self.count_center_coords()
 
     def get_new_id(self):
+        if len(self.bodies) == 0:   # нет тел
+            return 0
         return sorted(self.bodies, key=lambda x: x.id)[-1].id + 1
 
     def count_center_coords(self):

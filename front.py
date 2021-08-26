@@ -6,8 +6,7 @@ from PyQt5 import QtWidgets
 
 import design
 from consts import WIDTH, HEIGHT, FPS
-from core import World, Body, get_config_dict
-from structures import Vector
+from core import World, get_config_dict
 
 
 class QtApp(QtWidgets.QMainWindow, design.Ui_Form):
@@ -52,11 +51,11 @@ def run_app():
 def init_app():
     all_bodies = []
     mass = 10 ** 9
-    all_bodies.append(Body(0, mass, (300, 650), Vector((0, 0)), (255, 0, 0)))  # красный
-    all_bodies.append(Body(1, mass, (550, 300), Vector((0, 0)), (0, 255, 0)))  # зеленый
-    all_bodies.append(Body(2, mass, (600, 550), Vector((0, 0)), (0, 0, 255)))  # синий
-    all_bodies.append(Body(3, mass, (100, 100), Vector((0, 0)), (255, 100, 100)))
-    all_bodies.append(Body(4, mass, (300, 300), Vector((0, 0)), (128, 128, 128)))
+    # all_bodies.append(Body(0, mass, (300, 650), Vector((0, 0)), (255, 0, 0)))  # красный
+    # all_bodies.append(Body(1, mass, (550, 300), Vector((0, 0)), (0, 255, 0)))  # зеленый
+    # all_bodies.append(Body(2, mass, (600, 550), Vector((0, 0)), (0, 0, 255)))  # синий
+    # all_bodies.append(Body(3, mass, (100, 100), Vector((0, 0)), (255, 100, 100)))
+    # all_bodies.append(Body(4, mass, (300, 300), Vector((0, 0)), (128, 128, 128)))
     # all_bodies.append(Body(3, mass, (100, 100), Vector((0, 0)), (255, 255, 255)))
     # all_bodies.append(Body(4, mass * 10**2, (300, 300), Vector((0, 0)), (0, 0, 0)))
     # game = World(all_bodies)
@@ -99,23 +98,26 @@ if __name__ == '__main__':
         for elem in game.bodies:  # отрисовывание всех тел и отскок
             pygame.draw.circle(screen, elem.color, elem.coords, 20)
             k = game.k
-            if elem.coords[0] <= 0 or elem.coords[0] >= WIDTH:
+            if elem.coords[0] <= 0 or elem.coords[0] >= WIDTH:  # стукнулся в лево или право
                 elem.velocity.coords = (-1 * elem.velocity.coords[0] * k, elem.velocity.coords[1])
-                if elem.coords[0] <= 0:
+                if elem.coords[0] <= 0:  # если слишком влево
                     elem.coords = (1, elem.coords[1])
-                if elem.coords[0] >= WIDTH:
+                if elem.coords[0] >= WIDTH:  # если слишком вправо
                     elem.coords = (WIDTH - 1, elem.coords[1])
-            if elem.coords[1] <= 0 or elem.coords[1] >= HEIGHT:
+            if elem.coords[1] <= 0 or elem.coords[1] >= HEIGHT:  # стукнулся в низ или верх
                 elem.velocity.coords = (elem.velocity.coords[0], elem.velocity.coords[1] * -1 * k)
-                if elem.coords[0] <= 0:
+                if elem.coords[0] <= 0:  # слишком вверх
                     elem.coords = (elem.coords[0], 1)
-                if elem.coords[0] >= HEIGHT:
+                if elem.coords[0] >= HEIGHT:  # слишком мниз
                     elem.coords = (elem.coords[0], HEIGHT - 1)
 
         pygame.draw.circle(screen, (255, 255, 255), game.center_cords, 5)  # отрисовка центра масс системы
 
         if is_modeling:
-            game.count_all_forces_and_change_velocities()
+            try:  # если ошибка в вычислениях (часто когда нет тел)
+                game.count_all_forces_and_change_velocities()
+            except Exception:
+                print('Spawn body')
 
         clock.tick(FPS)
         pygame.display.flip()
