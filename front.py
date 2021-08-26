@@ -1,10 +1,11 @@
+import json
 import sys
 
 import pygame
 from PyQt5 import QtWidgets
 
 import design
-from consts import WIDTH, HEIGHT, K, FPS
+from consts import WIDTH, HEIGHT, FPS
 from core import World, Body, get_config_dict
 from structures import Vector
 
@@ -13,16 +14,32 @@ class QtApp(QtWidgets.QMainWindow, design.Ui_Form):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+
+        self.data = get_config_dict()
+
         self.k_slider.valueChanged[int].connect(self.change_values)  # В ПРОЦЕНТАХ ВВОД ПАМАТУШТА ТАК УДОБНЕЙ
         self.time_slider.valueChanged[int].connect(self.change_values)
         self.mass_slider.valueChanged[int].connect(self.change_values)
         self.x_slider.valueChanged[int].connect(self.change_values)
         self.y_slider.valueChanged[int].connect(self.change_values)
-        self.data = get_config_dict()
+
+        self.save_button.clicked.connect(self.save_json)
+        self.color_button.clicked.connect(self.change_color)
 
     def change_values(self, value):  # записать во временный json файл значения всех слайдеров
         name = self.sender().objectName()
         self.data[name] = value
+
+    def save_json(self):
+        json_data = json.dumps(self.data)
+        with open('temp/config.json', 'w') as file:
+            file.write(json_data)
+
+    def change_color(self):
+        color = QtWidgets.QColorDialog.getColor()
+        rgb = color.getRgb()
+        color_list = [rgb[0], rgb[1], rgb[2]]  # генератор списков? не
+        self.data['rgb'] = color_list
 
 
 def run_app():
@@ -50,15 +67,6 @@ def init_app():
     screen = pygame.display.set_mode(size)
     clock = pygame.time.Clock()
 
-    # PyQt init
-    # QtThread = threading.Thread(target=run_app)
-    # QtThread.start()
-    # design.runApp()
-    # app = QtWidgets.QApplication(sys.argv)
-    # window = QtApp()
-    # window.show()  # Показываем окно
-    # app.exec_()  # и запускаем приложение
-
     return all_bodies, screen, clock
 
 
@@ -74,26 +82,31 @@ if __name__ == '__main__':
                 running = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:  # ЛКМ
-                    coords = event.pos
-                    # game.create_body()
+                    coords = event.pos  # а может ( y, x )
+                    params = get_config_dict()
+                    mass, color = params['mass_slider'], params['rgb'],
+                    x_vel, y_vel = params['x_slider'], params['y_slider']
+                    game.create_body(mass, x_vel, y_vel, coords, color)
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     # is_modeling = not is_modeling
                     run_app()
-                    # TODO: считать из временного джсона все значения слайдеров и применить их
+                    params = get_config_dict()
+                    game.get_data_from_config(params)
                     # ЗАПИСАТЬ В КЛАСС ИГРЫ  К/100, А НЕ ПРОСТО К ТК ОН В ПРОЦЕНТАХ /\
 
         screen.fill((0, 0, 0))
         for elem in game.bodies:  # отрисовывание всех тел и отскок
             pygame.draw.circle(screen, elem.color, elem.coords, 20)
+            k = game.k
             if elem.coords[0] <= 0 or elem.coords[0] >= WIDTH:
-                elem.velocity.coords = (-1 * elem.velocity.coords[0] * K, elem.velocity.coords[1])
+                elem.velocity.coords = (-1 * elem.velocity.coords[0] * k, elem.velocity.coords[1])
                 if elem.coords[0] <= 0:
                     elem.coords = (1, elem.coords[1])
                 if elem.coords[0] >= WIDTH:
                     elem.coords = (WIDTH - 1, elem.coords[1])
             if elem.coords[1] <= 0 or elem.coords[1] >= HEIGHT:
-                elem.velocity.coords = (elem.velocity.coords[0], elem.velocity.coords[1] * -1 * K)
+                elem.velocity.coords = (elem.velocity.coords[0], elem.velocity.coords[1] * -1 * k)
                 if elem.coords[0] <= 0:
                     elem.coords = (elem.coords[0], 1)
                 if elem.coords[0] >= HEIGHT:

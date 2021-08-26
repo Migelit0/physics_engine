@@ -1,7 +1,7 @@
 import json
 from math import sqrt
 
-from consts import G, DELTA_TIME
+from consts import G
 from structures import Vector
 
 
@@ -65,7 +65,7 @@ class World:  # TODO: избавиться от констант и записа
 
                 a = equal_force / body_main.mass
                 # print(a.coords)
-                delta_velocity = a * DELTA_TIME
+                delta_velocity = a * self.delta_time
                 body_main.add_velocity(delta_velocity)
 
                 all_force = equal_force + all_force
@@ -86,14 +86,14 @@ class World:  # TODO: избавиться от констант и записа
             all_mass += body.mass
         self.center_cords = (center / all_mass).coords
 
-    def create_body(self, mass: float, x: int, y: int, coords: tuple, color: tuple):
-        vel = Vector((x, y))
+    def create_body(self, mass: float, x_vel: int, y_vel: int, coords: tuple, color: tuple):
+        vel = Vector((x_vel, y_vel))
         body = Body(self.get_new_id(), mass, coords, vel, color)
         self.bodies.append(body)
 
     def get_data_from_config(self, param_dict):  # полезно так полезно
         # внемание говнокод
-        self.k = param_dict['k_slider']
+        self.k = param_dict['k_slider'] / 100
         self.delta_time = param_dict['time_slider']
         # pass  # кпд, тик и все такое записать в переменные ИЗ СЛОВАРЯ
 
