@@ -2,6 +2,12 @@ class Vector:
     def __init__(self, coords: tuple):
         self.coords = coords
 
+    def get_x(self):
+        return self.coords[0]
+
+    def get_y(self):
+        return self.coords[1]
+
     def __add__(self, other):   # +
         return Vector((self.coords[0] + other.coords[0], self.coords[1] + other.coords[1]))
 

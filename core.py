@@ -6,12 +6,16 @@ from structures import Vector
 
 
 class Body:
-    def __init__(self, id: int, mass: float, coords: tuple, velocity: Vector, color: tuple):
+    def __init__(self, id: int, mass: float, coords: tuple, velocity: Vector, color: tuple, force: Vector):
         self.id = id
         self.mass = mass
         self.coords = coords
         self.velocity = velocity
         self.color = color
+        self.force = force
+
+    def update_force(self, new_force: Vector):
+        self.force = new_force
 
     def __eq__(self, other):
         return self.id == other.id
@@ -44,9 +48,9 @@ class World:  # TODO: избавиться от констант и записа
     def count_all_forces_and_change_velocities(self):
         all_force = Vector((0, 0))
         for body_main in self.bodies:
+            equal_force = Vector((0, 0))
             for body in self.bodies:
-                equal_force = Vector((0, 0))
-                if body_main != body:
+                if body_main != body:   # чтобы тело не действовало само на себя а то деление на 0 очевидно
                     x1, y1 = body.coords
                     x, y = body_main.coords
 
@@ -63,22 +67,23 @@ class World:  # TODO: избавиться от констант и записа
                     force = Vector((abc_force * cosa, abc_force * sina))
                     equal_force = equal_force + force
 
-                a = equal_force / body_main.mass
-                # print(a.coords)
-                delta_velocity = a * self.delta_time
-                body_main.add_velocity(delta_velocity)
+            a = equal_force / body_main.mass
+            # print(a.coords)
+            delta_velocity = a * self.delta_time
+            body_main.add_velocity(delta_velocity)
 
-                all_force = equal_force + all_force
+            body_main.update_force(equal_force)  # обновляем силу действующую на тело
+            all_force = equal_force + all_force  # в суму всех сил добавляем текущую
 
         for body in self.bodies:
             body.update_coords()
 
-        print(equal_force.coords)
+        print(all_force.coords)
 
         self.count_center_coords()
 
     def get_new_id(self):
-        if len(self.bodies) == 0:   # нет тел
+        if len(self.bodies) == 0:  # нет тел
             return 0
         return sorted(self.bodies, key=lambda x: x.id)[-1].id + 1
 
@@ -92,7 +97,7 @@ class World:  # TODO: избавиться от констант и записа
 
     def create_body(self, mass: float, x_vel: int, y_vel: int, coords: tuple, color: tuple):
         vel = Vector((x_vel, y_vel))
-        body = Body(self.get_new_id(), mass, coords, vel, color)
+        body = Body(self.get_new_id(), mass, coords, vel, color, Vector((0, 0)))
         self.bodies.append(body)
 
     def get_data_from_config(self, param_dict):  # полезно так полезно
