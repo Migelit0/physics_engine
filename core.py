@@ -1,21 +1,25 @@
 import json
 from math import sqrt
 
-from consts import G
+from consts import G, BALL_SIZE, WIDTH, HEIGHT
 from structures import Vector
 
 
 class Body:
-    def __init__(self, id: int, mass: float, coords: tuple, velocity: Vector, color: tuple, force: Vector):
+    def __init__(self, id: int, mass: float, coords: tuple, velocity: Vector, color: tuple):
         self.id = id
         self.mass = mass
         self.coords = coords
         self.velocity = velocity
         self.color = color
-        self.force = force
+        self.force = Vector((0, 0))
+        self.speedup = Vector((0, 0))
 
     def update_force(self, new_force: Vector):
         self.force = new_force
+
+    def update_speedup(self, new_speedup: Vector):
+        self.speedup = new_speedup
 
     def __eq__(self, other):
         return self.id == other.id
@@ -50,7 +54,7 @@ class World:  # TODO: избавиться от констант и записа
         for body_main in self.bodies:
             equal_force = Vector((0, 0))
             for body in self.bodies:
-                if body_main != body:   # чтобы тело не действовало само на себя а то деление на 0 очевидно
+                if body_main != body:  # чтобы тело не действовало само на себя а то деление на 0 очевидно
                     x1, y1 = body.coords
                     x, y = body_main.coords
 
@@ -72,13 +76,15 @@ class World:  # TODO: избавиться от констант и записа
             delta_velocity = a * self.delta_time
             body_main.add_velocity(delta_velocity)
 
-            body_main.update_force(equal_force)  # обновляем силу действующую на тело
-            all_force = equal_force + all_force  # в суму всех сил добавляем текущую
+            body_main.update_speedup(a)  # обновляем ускорение тела
+            body_main.update_force(equal_force) # щбновляем силу действующую на тело
+
+            all_force = equal_force + all_force  # в сумму всех сил добавляем текущую
 
         for body in self.bodies:
             body.update_coords()
 
-        print(all_force.coords)
+        # print(all_force.coords)
 
         self.count_center_coords()
 
@@ -97,7 +103,7 @@ class World:  # TODO: избавиться от констант и записа
 
     def create_body(self, mass: float, x_vel: int, y_vel: int, coords: tuple, color: tuple):
         vel = Vector((x_vel, y_vel))
-        body = Body(self.get_new_id(), mass, coords, vel, color, Vector((0, 0)))
+        body = Body(self.get_new_id(), mass, coords, vel, color)
         self.bodies.append(body)
 
     def get_data_from_config(self, param_dict):  # полезно так полезно
@@ -105,6 +111,24 @@ class World:  # TODO: избавиться от констант и записа
         self.k = param_dict['k_slider'] / 100
         self.delta_time = param_dict['time_slider']
         # pass  # кпд, тик и все такое записать в переменные ИЗ СЛОВАРЯ
+
+    def check_coords(self):
+        for elem in self.bodies:  # отрисовывание всех тел и отскок
+            k = self.k  # спасибо спасибо спасибо спасибо спасибо спасибо спасибо спасибо спасибо спасибо спасибо
+            # TODO: нормальное отталкивание (то есть размеры тел) и тогда убрать болл сайз отсюда вообще
+            # для версии без боллсайза см ранее 27.08
+            if elem.coords[0] <= BALL_SIZE or elem.coords[0] >= WIDTH:  # стукнулся в лево или право
+                elem.velocity.coords = (-1 * elem.velocity.get_x() * k, elem.velocity.get_y() * k)
+                if elem.coords[0] <= BALL_SIZE:  # если слишком влево
+                    elem.coords = (BALL_SIZE + 1, elem.coords[1])
+                if elem.coords[0] >= WIDTH:  # если слишком вправо
+                    elem.coords = (WIDTH - 1, elem.coords[1])
+            if elem.coords[1] <= BALL_SIZE or elem.coords[1] >= HEIGHT - BALL_SIZE:  # стукнулся в низ или верх
+                elem.velocity.coords = (elem.velocity.get_x() * k, elem.velocity.get_y() * -1 * k)
+                if elem.coords[1] <= BALL_SIZE:  # слишком вверх
+                    elem.coords = (elem.coords[0], BALL_SIZE + 1)
+                if elem.coords[1] >= HEIGHT - BALL_SIZE:  # слишком вниз
+                    elem.coords = (elem.coords[0], HEIGHT - BALL_SIZE - 1)
 
 
 def get_config_dict():
