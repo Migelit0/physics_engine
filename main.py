@@ -36,7 +36,7 @@ def init_app():
     return all_bodies, screen, clock
 
 
-def riso2ch(screen):
+def riso2ch(screen):    # TODO: отрисовать  прошедшую телом траекторию
     screen.fill((0, 0, 0))
 
     # отрисовка тел
@@ -51,20 +51,19 @@ def riso2ch(screen):
         # ОПАСНО НЕ ВХОДИТЬ МНОГО СТРЕЛОЧЕч
 
         # отрисовка вектора СКОРОСТИ ПОМНОЖЕННО1 НА УВЕЛИЧЕСНИЕ
-        temp_velocity = elem.velocity * BIGGER * 0.5**4
+        temp_velocity = elem.velocity * BIGGER * 0.5 ** 4
         pygame.draw.line(screen, (0, 0, 255), elem.coords,  # (elem.coords[0] * 10, elem.coords[1] * 10),
                          (elem.coords[0] + temp_velocity.get_x(), elem.coords[1] + temp_velocity.get_y()), 2)
 
         # отрисовка вектора УСКОРЕНИЯ * УВЕЛИЧЕНИЕ
-        temp_a = elem.force * BIGGER#**1.5   # В СИЛЕ ТЕЛА ЛЕЖИТ УСКОРЕНИЯ ПОТОМУ ЧТО Я В САМОЛЕТЕ И ХЗ КАК ПЕРЕВОДИТСЯ
-        print(temp_a.coords)
-        pygame.draw.line(screen, (255, 0, 0), elem.coords,
-                         (elem.coords[0] + temp_a.get_x(), elem.coords[1] + temp_a.get_y()), 2)
+        #temp_a = elem.speedup * BIGGER  # **1.5   # В СИЛЕ ТЕЛА ЛЕЖИТ УСКОРЕНИЯ ПОТОМУ ЧТО Я В САМОЛЕТЕ И ХЗ КАК ПЕРЕВОДИТСЯ
+        #print(temp_a.coords)
+        #pygame.draw.line(screen, (0, 255, 0), elem.coords,
+        #                 (elem.coords[0] + temp_a.get_x(), elem.coords[1] + temp_a.get_y()), 2)
 
         # отрисовка вектотра силы
-        pygame.draw.line(screen, (0, 255, 0), elem.coords,
+        pygame.draw.line(screen, (255, 0, 0), elem.coords,
                          (elem.coords[0] + elem.force.get_x(), elem.coords[1] + elem.force.get_y()), 2)
-
 
         # ОПАСНОСТЬ МИНОВАЛА
 
@@ -92,6 +91,7 @@ def body_creator(coords):
     x_vel, y_vel = params['x_slider'], params['y_slider']
     game.create_body(mass, x_vel, y_vel, coords, color)
 
+
 if __name__ == '__main__':
     all_bodies, screen, clock = init_app()
     game = World(all_bodies)
@@ -118,6 +118,7 @@ if __name__ == '__main__':
         if is_modeling:
             try:  # если ошибка в вычислениях (обычно когда нет тел)
                 game.count_all_forces_and_change_velocities()
+                print('👍')
             except Exception:
                 print(f'NUMBER OF BODIES: {len(game.bodies)}')
 
