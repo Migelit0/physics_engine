@@ -1,7 +1,7 @@
 import json
 from math import sqrt
 
-from consts import G, BALL_SIZE, WIDTH, HEIGHT
+from consts import G, BALL_SIZE, WIDTH, HEIGHT, MAX_TRAJECTORY_LEN, TRAJECTORY_UPDATE_TIME
 from structures import Vector
 
 
@@ -14,12 +14,19 @@ class Body:
         self.color = color
         self.force = Vector((0, 0))
         self.speedup = Vector((0, 0))
+        self.trajectory = []
 
     def update_force(self, new_force: Vector):
         self.force = new_force
 
     def update_speedup(self, new_speedup: Vector):
         self.speedup = new_speedup
+
+    def update_trajectory(self):
+        if len(self.trajectory) == MAX_TRAJECTORY_LEN:
+            del self.trajectory[0]
+
+        self.trajectory.append(self.coords)
 
     def __eq__(self, other):
         return self.id == other.id
@@ -45,46 +52,51 @@ class World:  # TODO: избавиться от констант и записа
         self.bodies = bodies
         self.center_cords = (0, 0)
         self.get_data_from_config(get_config_dict())
+        self.update_num = 0
 
     def count_abc_force_for_two_bodies(self, body_1: Body, body_2: Body):
         return G * body_1.mass * body_2.mass / ((body_1 ^ body_2) ** 2)
 
+    def count_forces_for_body(self, body_main):
+        equal_force = Vector((0, 0))
+        for body in self.bodies:
+            if body_main != body:  # чтобы тело не действовало само на себя а то деление на 0 очевидно
+                x1, y1 = body.coords
+                x, y = body_main.coords
+
+                dx, dy = x1 - x, y1 - y
+                long = sqrt(dx ** 2 + dy ** 2)  # это типа гипотенуза треугольника
+                sina = dy / long
+                cosa = dx / long
+
+                abc_force = self.count_abc_force_for_two_bodies(body_main, body)
+                force = Vector((abc_force * cosa, abc_force * sina))
+                equal_force = equal_force + force
+        return equal_force
+
     def count_all_forces_and_change_velocities(self):
         all_force = Vector((0, 0))
         for body_main in self.bodies:
-            equal_force = Vector((0, 0))
-            for body in self.bodies:
-                if body_main != body:  # чтобы тело не действовало само на себя а то деление на 0 очевидно
-                    x1, y1 = body.coords
-                    x, y = body_main.coords
-
-                    dx, dy = x1 - x, y1 - y
-                    long = sqrt(dx ** 2 + dy ** 2)  # это типа гипотенуза треугольника
-                    sina = dy / long
-                    cosa = dx / long
-
-                    # alpha = atan2(sina,  cosa)  # пипец вообще умно
-                    # sina = sin(alpha)
-                    # cosa = cos(alpha)
-
-                    abc_force = self.count_abc_force_for_two_bodies(body_main, body)
-                    force = Vector((abc_force * cosa, abc_force * sina))
-                    equal_force = equal_force + force
+            equal_force = self.count_forces_for_body(body_main)
 
             a = equal_force / body_main.mass
-            # print(a.coords)
             delta_velocity = a * self.delta_time
             body_main.add_velocity(delta_velocity)
 
             body_main.update_speedup(a)  # обновляем ускорение тела
-            body_main.update_force(equal_force) # щбновляем силу действующую на тело
+            body_main.update_force(equal_force)  # щбновляем силу действующую на тело
 
+            if self.update_num == TRAJECTORY_UPDATE_TIME:
+                body_main.update_trajectory()
             all_force = equal_force + all_force  # в сумму всех сил добавляем текущую
 
         for body in self.bodies:
             body.update_coords()
 
-        # print(all_force.coords)
+        if self.update_num == TRAJECTORY_UPDATE_TIME:
+            self.update_num = 0
+        else:
+            self.update_num += 1
 
         self.count_center_coords()
 

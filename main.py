@@ -4,7 +4,7 @@ import pygame
 from PyQt5 import QtWidgets
 
 from QtSettingsApp import QtSettingsApp
-from consts import WIDTH, HEIGHT, FPS, MENU_SIZE, BALL_SIZE, TAB, BIGGER
+from consts import WIDTH, HEIGHT, FPS, MENU_SIZE, BALL_SIZE, TAB, BIGGER, TRAJECTORY_SIZE
 from core import World, get_config_dict
 
 
@@ -36,7 +36,7 @@ def init_app():
     return all_bodies, screen, clock
 
 
-def riso2ch(screen):    # TODO: отрисовать  прошедшую телом траекторию
+def riso2ch(screen):
     screen.fill((0, 0, 0))
 
     # отрисовка тел
@@ -56,9 +56,9 @@ def riso2ch(screen):    # TODO: отрисовать  прошедшую тел�
                          (elem.coords[0] + temp_velocity.get_x(), elem.coords[1] + temp_velocity.get_y()), 2)
 
         # отрисовка вектора УСКОРЕНИЯ * УВЕЛИЧЕНИЕ
-        #temp_a = elem.speedup * BIGGER  # **1.5   # В СИЛЕ ТЕЛА ЛЕЖИТ УСКОРЕНИЯ ПОТОМУ ЧТО Я В САМОЛЕТЕ И ХЗ КАК ПЕРЕВОДИТСЯ
-        #print(temp_a.coords)
-        #pygame.draw.line(screen, (0, 255, 0), elem.coords,
+        # temp_a = elem.speedup * BIGGER  # **1.5   # В СИЛЕ ТЕЛА ЛЕЖИТ УСКОРЕНИЯ ПОТОМУ ЧТО Я В САМОЛЕТЕ И ХЗ КАК ПЕРЕВОДИТСЯ
+        # print(temp_a.coords)
+        # pygame.draw.line(screen, (0, 255, 0), elem.coords,
         #                 (elem.coords[0] + temp_a.get_x(), elem.coords[1] + temp_a.get_y()), 2)
 
         # отрисовка вектотра силы
@@ -70,6 +70,12 @@ def riso2ch(screen):    # TODO: отрисовать  прошедшую тел�
         # отрисовка центра масс системы
         pygame.draw.circle(screen, (0, 0, 0), game.center_cords, 6)
         pygame.draw.circle(screen, (255, 255, 255), game.center_cords, 5)
+
+        # отрисовка траектории всех тел
+        for body in game.bodies:
+            dotes = body.trajectory
+            for elem in dotes:
+                pygame.draw.circle(screen, body.color, elem, TRAJECTORY_SIZE)
 
         # отрисовка отображения параметров:
         pygame.draw.line(screen, (255, 255, 255), (WIDTH + BALL_SIZE, 0), (WIDTH + BALL_SIZE, HEIGHT), 5)
