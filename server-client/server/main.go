@@ -1,9 +1,10 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/migelit0/physics_engine/server-client/server/core/constants"
+)
 
 func main() {
-	var bodies [2]int
-	bodies[0] = 1
-	fmt.Println(bodies[0])
+	fmt.Println(constants.G + 1)
 }
