@@ -39,6 +39,6 @@ func (b Body) updateSpeed() {
 
 func (b Body) updateAll(force *Vector) {
 	b.updateSpeedup(force)
-	b.addSpeed()
+	b.updateSpeed()
 	b.updateCoords()
 }
