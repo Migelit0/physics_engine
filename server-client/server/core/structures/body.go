@@ -1,4 +1,4 @@
-package structures
+package core
 
 import "math"
 
@@ -32,7 +32,7 @@ func (b Body) updateSpeedup(force *Vector) {
 	b.speedUp = b.speedUp.add(&dSpeedup)
 }
 
-func (b Body) addSpeed() {
+func (b Body) updateSpeed() {
 	var dSpeed Vector = b.speedUp.mul(*b.factor)
 	b.speed = b.speed.add(&dSpeed)
 }

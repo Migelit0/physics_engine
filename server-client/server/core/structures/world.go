@@ -1,4 +1,4 @@
-package structures
+package core
 
 import "math"
 
@@ -51,4 +51,21 @@ func (w World) calcForceTwoBodies(b0, b1 *Body) Vector {
 
 func (w World) calcAbcForceTwoBodies(b0, b1 *Body, R float64) float64 {
 	return *w.G * b0.Mass() * b1.Mass() / (R * R)
+}
+
+func (w World) handleBody(index *int) {
+	var force Vector
+	force = w.calcForceForBody(index)
+	w.bodies[*index].updateSpeedup(&force)
+	w.bodies[*index].updateSpeed()
+}
+
+func (w World) doOneIter() {
+	for i, _ := range w.bodies {
+		w.handleBody(&i)
+	}
+
+	for i, _ := range w.bodies {
+		w.bodies[i].updateCoords()
+	}
 }

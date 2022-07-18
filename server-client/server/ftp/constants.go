@@ -1,4 +1,4 @@
-package constants
+package ftp
 
 var FACTOR float64 = 100 // тиков в секунду
 var WIDTH int16 = 700
